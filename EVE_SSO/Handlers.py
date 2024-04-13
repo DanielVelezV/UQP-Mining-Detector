@@ -6,9 +6,8 @@ from jose import jwt
 import json
 
 
-
 # Scopes that will be requested on player login
-current_scopes = ["esi-industry.read_corporation_mining.v1"]
+current_scopes = ["esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
 
 
 
@@ -25,7 +24,7 @@ def create_sso_url():
 
     __base_url += f"state={STATE}&"
 
-    __base_url += f"scope={','.join(current_scopes)}"
+    __base_url += f"scope={'%20'.join(current_scopes)}"
 
     return __base_url
 
