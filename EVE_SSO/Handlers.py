@@ -7,7 +7,7 @@ import json
 
 
 # Scopes that will be requested on player login
-current_scopes = ["esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
+current_scopes = ["esi-universe.read_structures.v1", "esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
 
 
 
@@ -176,9 +176,10 @@ def refresh_token(uuid: str):
     contents = check_token_signature(response.json()["access_token"])
 
     if not contents:
-        return "Error decrypting your Auth Code. Communicate with ElWarriorcito"
+        return False
 
     # Saving the data
 
     save_data(contents, response.json())
+    return True
 
