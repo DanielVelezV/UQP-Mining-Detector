@@ -1,7 +1,6 @@
-from EVE_SSO import create_sso_url, check_state, get_auth, check_token_signature, save_data
+from EVE_SSO import create_sso_url, check_state, get_auth, check_token_signature, save_data, refresh_token
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
-
 
 app = FastAPI(title = "EVE SSO Auth Programn")
 
@@ -20,10 +19,6 @@ async def sso(request: Request, code: str, state: str):
     
     response = get_auth(code)
 
-    if response.status_code != 200:
-        return "Error getting data. Communicate with ElWarriorcito"
-
-
     # Checking the token signature. Security Handler
     contents = check_token_signature(response.json()["access_token"])
 
@@ -35,9 +30,3 @@ async def sso(request: Request, code: str, state: str):
     save_data(contents, response.json())
 
     return RedirectResponse("https://www.eveonline.com")
-
-
-
-
-
-

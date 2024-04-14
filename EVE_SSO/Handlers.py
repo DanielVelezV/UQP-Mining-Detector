@@ -11,7 +11,7 @@ current_scopes = ["esi-characters.read_corporation_roles.v1", "esi-industry.read
 
 
 
-
+# SSO URL. Used to register new users
 def create_sso_url():
 
     __base_url = "https://login.eveonline.com/v2/oauth/authorize/?"
@@ -28,11 +28,12 @@ def create_sso_url():
 
     return __base_url
 
+# Easy check. Checking if the state sent in the SSO Url is the same received by the server.
 def check_state(state) -> bool:
     return state == STATE
 
-
-def get_auth(code):
+# Generate the Auth code. This is a bearer token to use in the ESI
+def get_auth(code, garant_type = "authorization_code"):
 
 
     # Base URL of EVE Auth Servers
@@ -48,10 +49,17 @@ def get_auth(code):
 
     base_64_string = encoded_string_bytes.decode("ascii")
 
-    params = {
-        "grant_type": "authorization_code",
-        "code": code
-    }
+    if garant_type == "authorization_code":
+        params = {
+            "grant_type": garant_type,
+            "code": code
+        }
+    elif garant_type == "refresh_token":
+        params = {
+            "grant_type": garant_type,
+            "refresh_token": code
+        }
+
 
     params = url_encode(params)
 
@@ -67,14 +75,16 @@ def get_auth(code):
 
     return response
 
+# Encode URL params
 def url_encode(params):
     
     return "&".join(f"{key}={value}" for key, value in params.items())
-    
+
+# Used to save data into the data.json. data.json is in .gitignore to protect the data
 def save_data(decrypted_jwt, jwt):
 
     # Data saving for chars. 
-    # TODO: Move everything to a Relational Database
+    # TODO: Move everything to a Non-Relational Database
 
 
     data = json.load(open("data.json"))
@@ -104,7 +114,7 @@ def save_data(decrypted_jwt, jwt):
 
         return False
 
-
+# Checking the token signature with Eve servers. Used to decrypt the bearer token that we previously obtained
 def check_token_signature(token):
 
     # Method to check the signature of the obtained token. 
@@ -144,4 +154,31 @@ def check_token_signature(token):
 
     return contents
 
-   
+# Get data from the data.json using the hashId for the player.
+def get_data(uuid: str):
+    data = json.load(open("data.json"))
+
+    if uuid not in data["Chars"]:
+        return None
+    
+    return data["Chars"][uuid]
+
+# Used to refresh the token for the player.
+def refresh_token(uuid: str):
+
+    char = get_data(uuid)
+
+    if not char:
+        return False
+    
+    response = get_auth(char["refresh_access_token"], "refresh_token")
+
+    contents = check_token_signature(response.json()["access_token"])
+
+    if not contents:
+        return "Error decrypting your Auth Code. Communicate with ElWarriorcito"
+
+    # Saving the data
+
+    save_data(contents, response.json())
+
