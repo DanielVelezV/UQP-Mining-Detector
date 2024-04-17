@@ -4,11 +4,12 @@ import httpx
 import base64
 from jose import jwt
 import json
-
+import Query
+from Models.PydanticModels import *
+import time
 
 # Scopes that will be requested on player login
-current_scopes = ["esi-universe.read_structures.v1", "esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
-
+current_scopes = ["esi-mail.read_mail.v1", "esi-universe.read_structures.v1", "esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
 
 
 # SSO URL. Used to register new users
@@ -164,22 +165,28 @@ def get_data(uuid: str):
     return data["Chars"][uuid]
 
 # Used to refresh the token for the player.
-def refresh_token(uuid: str):
+def refresh_token(char_hash):
 
-    char = get_data(uuid)
+    data = Query.UQPData.get_user(char_hash)
 
-    if not char:
+    if not data:
         return False
-    
-    response = get_auth(char["refresh_access_token"], "refresh_token")
 
-    contents = check_token_signature(response.json()["access_token"])
+    auth = CharAUth.model_validate(get_auth(data["AuthData"]["Refresh_Access_Token"], "refresh_token").json())
+
+    contents = CharDecryptedAuth.model_validate(check_token_signature(auth.access_token))
 
     if not contents:
         return False
 
     # Saving the data
 
-    save_data(contents, response.json())
-    return True
+    AuthData = AuthDataModel(
+            Access_Token = auth.access_token,
+            Refresh_Access_Token = auth.refresh_token,
+            Last_Refresh_Milis = round(time.time()),
+            Scopes = contents.scp
+        )
+    
+    return Query.UQPData.update_token(char_hash, AuthData)
 
