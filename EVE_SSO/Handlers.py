@@ -9,7 +9,7 @@ from Models.PydanticModels import *
 import time
 
 # Scopes that will be requested on player login
-current_scopes = ["esi-mail.read_mail.v1", "esi-universe.read_structures.v1", "esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
+current_scopes = ["esi-location.read_location.v1", "esi-mail.read_mail.v1", "esi-universe.read_structures.v1", "esi-characters.read_corporation_roles.v1", "esi-industry.read_corporation_mining.v1"]
 
 
 # SSO URL. Used to register new users

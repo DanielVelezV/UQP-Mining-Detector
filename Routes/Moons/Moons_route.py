@@ -2,7 +2,7 @@ from fastapi import APIRouter
 import EVE_ESI
 import datetime
 import Query
-
+from .Moons_data_converter import is_correct
 
 moons_route = APIRouter(prefix = "/Moons", tags = ["Moons"])
 
@@ -53,16 +53,21 @@ async def get_all_moons():
 
         response = EVE_ESI.corp_mining_extraction(token)
 
-        arrival_time = datetime.datetime.fromisoformat(response.json()[0]["chunk_arrival_time"]).replace(tzinfo = None)
+        arrival_time = response.json()[0]["chunk_arrival_time"]
+        extraction_time = response.json()[0]["extraction_start_time"]
 
         moon_info = EVE_ESI.get_structure_name(token, response.json()[0]["structure_id"])
 
-        data.append({
-            "Moon Name" : moon_info,
-            "Arrival Time" : arrival_time.strftime("%d %B %Y %H:%M:%S")
-        })
+        is_hour_correct, is_day_correct, moon_cycle, time_between = is_correct(moon_info, arrival_time, extraction_time)
 
-
+        if is_hour_correct and is_hour_correct and moon_cycle and time_between:
+            data.append({
+                "Hour Correct" : is_hour_correct,
+                "Day Correct" : is_day_correct,
+                "Moon Current Cycle" : moon_cycle,
+                "Time" : str(time_between)
+            })
+    
 
     return data
 
