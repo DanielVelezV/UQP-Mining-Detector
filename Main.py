@@ -7,6 +7,8 @@ from Models import PydanticModels as Models
 import EVE_ESI
 import time
 
+#Trial Alfa380
+
 app = FastAPI(title = "EVE SSO Auth Programn")
 
 app.include_router(Routes.moons_route)
