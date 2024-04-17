@@ -11,6 +11,7 @@ uvicorn = "*"
 httpx = "*"
 pyjwt = {extras = ["crypto"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
+pymongo = "*"
 
 [dev-packages]
 
