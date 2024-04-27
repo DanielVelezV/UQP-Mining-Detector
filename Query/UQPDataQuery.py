@@ -1,4 +1,4 @@
-from Db.Conn.Connection import client, DB, UQPDC
+from Db.Conn.Connection import client, DB, UQPDC, UQPWarC
 from Models.PydanticModels import *
 
 
@@ -41,6 +41,24 @@ class UQPData():
     @staticmethod
     def get_all_moon_users():
         data = UQPDC.find({"CorpInfo.Roles" : "Station_Manager" })
+
+        return data
+
+    #endregion
+
+    #region War
+    @staticmethod
+    def get_last_checked_war():
+        data = UQPWarC.find().limit(1).sort([('$natural',-1)])
+
+        return data
+
+    @staticmethod
+    def insert_war_data(wars: list[WarChecker]):
+        
+        models = [x.model_dump() for x in wars]
+
+        data = UQPWarC.insert_many(models)
 
         return data
 

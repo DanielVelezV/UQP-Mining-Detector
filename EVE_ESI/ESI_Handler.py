@@ -112,6 +112,38 @@ def get_structure_name(token, struc_id) -> str:
 
     return response.json()["name"]
 
+def get_corps_in_alliance(alliance_id):
 
+    URL = str(__BASE_URL)
 
+    URL += f"alliances/{alliance_id}/corporations/?datasource=tranquility"
 
+    response = httpx.get(URL)
+
+    response.raise_for_status()
+
+    return response.json()
+
+def get_war_list():
+
+    URL = str(__BASE_URL)
+
+    URL += f"wars/?datasource=tranquility"
+
+    response = httpx.get(URL)
+
+    response.raise_for_status()
+
+    return response.json()
+
+def get_war_info(war_id):
+
+    URL = str(__BASE_URL)
+
+    URL += f"wars/{war_id}/?datasource=tranquility"
+
+    response = httpx.get(URL)
+
+    response.raise_for_status()
+
+    return response.json()

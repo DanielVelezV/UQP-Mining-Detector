@@ -10,3 +10,7 @@ UQPDC = DB["UQPData"]
 
 UQPMoonC = DB["UQPMoons"]
 
+UQPWarC = DB["UQPWar"]
+
+
+

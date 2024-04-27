@@ -11,6 +11,7 @@ app = FastAPI(title = "EVE SSO Auth Programn")
 
 app.include_router(Routes.moons_route)
 app.include_router(Routes.sso_token_route)
+app.include_router(Routes.war_route)
 
 @app.get("/", include_in_schema = False)
 async def read_root():
